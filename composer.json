@@ -1,0 +1,64 @@
+{
+    "name": "franbarbalopez/laravel-playwright",
+    "description": "A Laravel Package to use Laravel testing functionality into Playwright",
+    "type": "library",
+    "require": {
+        "php": "^8.2",
+        "illuminate/support": "^12.1"
+    },
+    "require-dev": {
+        "pestphp/pest": "^3.7",
+        "orchestra/testbench": "^10.1",
+        "nunomaduro/collision": "^8.6"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "FranBarbaLopez\\LaravelPlaywright\\": "src/",
+            "FranBarbaLopez\\LaravelPlaywright\\Tests\\": "tests/"
+        }
+    },
+    "authors": [
+        {
+            "name": "franbarbalopez",
+            "email": "franciscojose.barbalopez@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [
+                "FranBarbaLopez\\LaravelPlaywright\\LaravelPlaywrightServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Workbench\\App\\": "workbench/app/",
+            "Workbench\\Database\\Factories\\": "workbench/database/factories/",
+            "Workbench\\Database\\Seeders\\": "workbench/database/seeders/"
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": [
+            "@clear",
+            "@prepare"
+        ],
+        "clear": "@php vendor/bin/testbench package:purge-skeleton --ansi",
+        "prepare": "@php vendor/bin/testbench package:discover --ansi",
+        "build": "@php vendor/bin/testbench workbench:build --ansi",
+        "serve": [
+            "Composer\\Config::disableProcessTimeout",
+            "@build",
+            "@php vendor/bin/testbench serve --ansi"
+        ],
+        "test": [
+            "@clear",
+            "@php vendor/bin/pest"
+        ]
+    }
+}
