@@ -4,11 +4,11 @@
     "type": "library",
     "require": {
         "php": "^8.2",
-        "illuminate/support": "^12.1"
+        "illuminate/support": "^11.0|^12.0"
     },
     "require-dev": {
         "pestphp/pest": "^3.7",
-        "orchestra/testbench": "^10.1",
+        "orchestra/testbench": "^9.0|^10.0",
         "nunomaduro/collision": "^8.6"
     },
     "license": "MIT",
