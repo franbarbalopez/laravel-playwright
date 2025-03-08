@@ -13,7 +13,11 @@ use FranBarbaLopez\LaravelPlaywright\Tests\TestCase;
 |
 */
 
-pest()->extend(TestCase::class)->in('Feature');
+pest()->extend(TestCase::class)
+    ->beforeEach(function () {
+        $this->freezeTime();
+    })
+    ->in('Feature');
 
 /*
 |--------------------------------------------------------------------------

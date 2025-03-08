@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Testing\Fluent\AssertableJson;
+use Workbench\App\Models\Role;
 
 test('gets csrf token', function () {
     $response = $this->getJson(route('playwright.csrf-token'))
