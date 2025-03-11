@@ -51,4 +51,46 @@ class PlaywrightController
             ], 500);
         }
     }
+
+    public function login(Request $request)
+    {
+        $userModel = config('auth.providers.users.model');
+
+        $userId = $request->input('id');
+        $attributes = $request->input('attributes', []);
+        $relationships = $request->input('relationships', []);
+        $states = $request->input('states', []);
+        $load = $request->input('load', []);
+
+        if ($userId) {
+            $user = $userModel::findOrFail($userId);
+        } else {
+            $user = $this->factoryService
+                ->buildFactory(
+                    model: $userModel,
+                    relationships: $relationships,
+                    attributes: $attributes,
+                    states: $states,
+                    load: $load,
+                );
+        }
+
+        if (! empty($load)) {
+            $user->load($load);
+        }
+
+        auth()->login($user);
+
+        return response()->json($user);
+    }
+
+    public function logout(): void
+    {
+        auth()->logout();
+    }
+
+    public function user()
+    {
+        return response()->json(auth()->user());
+    }
 }

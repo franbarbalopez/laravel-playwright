@@ -2,7 +2,9 @@
 
 use Illuminate\Support\Carbon;
 use Illuminate\Testing\Fluent\AssertableJson;
+use Workbench\App\Models\Post;
 use Workbench\App\Models\Role;
+use Workbench\App\Models\User;
 
 test('gets csrf token', function () {
     $response = $this->getJson(route('playwright.csrf-token'))
@@ -304,4 +306,127 @@ test('handles gracefully when optional parameters are empty', function () {
     ])
         ->assertOk()
         ->assertJsonStructure(['id', 'name', 'email']);
+});
+
+test('can login using existing user id', function () {
+    $user = User::factory()->create([
+        'name' => 'Existing User',
+        'email' => 'existing@example.com',
+    ]);
+
+    $this->postJson(route('playwright.login'), [
+        'id' => $user->id,
+    ])
+        ->assertOk()
+        ->assertJson(fn (AssertableJson $json) => $json->where('id', $user->id)
+            ->where('name', 'Existing User')
+            ->where('email', 'existing@example.com')
+            ->etc()
+        );
+
+    expect(auth()->check())->toBeTrue();
+    expect(auth()->id())->toBe($user->id);
+});
+
+test('can login using existing user id with relations loaded', function () {
+    $user = User::factory()->create();
+    Post::factory()->count(2)->for($user)->create();
+
+    $this->postJson(route('playwright.login'), [
+        'id' => $user->id,
+        'load' => ['posts'],
+    ])
+        ->assertOk()
+        ->assertJson(fn (AssertableJson $json) => $json->has('posts', 2)
+            ->etc()
+        );
+
+    expect(auth()->id())->toBe($user->id);
+});
+
+test('can create and login new user', function () {
+    $this->postJson(route('playwright.login'), [
+        'attributes' => [
+            'name' => 'New User',
+            'email' => 'new@example.com',
+        ],
+    ])
+        ->assertOk()
+        ->assertJson(fn (AssertableJson $json) => $json->where('name', 'New User')
+            ->where('email', 'new@example.com')
+            ->etc()
+        );
+
+    expect(auth()->check())->toBeTrue();
+});
+
+test('can create and login new user with states', function () {
+    $response = $this->postJson(route('playwright.login'), [
+        'states' => ['unverified'],
+        'relationships' => [
+            [
+                'method' => 'has',
+                'name' => 'posts',
+                'related' => 'Workbench\App\Models\Post',
+                'count' => 1,
+            ],
+        ],
+        'load' => ['posts'],
+    ]);
+
+    $response->assertOk()
+        ->assertJson(fn (AssertableJson $json) => $json->where('email_verified_at', null)
+            ->has('posts', 1)
+            ->etc()
+        );
+
+    expect(auth()->check())->toBeTrue();
+});
+
+test('can logout user', function () {
+    $user = User::factory()->create();
+
+    auth()->login($user);
+
+    expect(auth()->check())->toBeTrue();
+
+    $this->postJson(route('playwright.logout'));
+
+    expect(auth()->check())->toBeFalse();
+});
+
+test('returns authenticated user', function () {
+    $user = User::factory()->create();
+
+    auth()->login($user);
+
+    $this->getJson(route('playwright.user'))
+        ->assertOk()
+        ->assertJson(fn (AssertableJson $json) => $json->where('id', $user->id)
+            ->etc()
+        );
+});
+
+test('creates a new model using for method with states applied to related model', function () {
+    $this->postJson(route('playwright.factory'), [
+        'model' => 'Workbench\App\Models\Post',
+        'load' => ['user'],
+        'relationships' => [
+            [
+                'method' => 'for',
+                'name' => 'user',
+                'related' => 'Workbench\App\Models\User',
+                'states' => ['unverified'],
+                'attributes' => ['name' => 'John Doe with State'],
+            ],
+        ],
+    ])
+        ->assertOk()
+        ->assertJson(fn (AssertableJson $json) => $json->has('user', fn (AssertableJson $json) => $json
+            ->where('name', 'John Doe with State')
+            ->where('email_verified_at', null) // Verificamos que el estado 'unverified' se aplicó correctamente
+            ->etc()
+        )
+            ->etc()
+        );
 });

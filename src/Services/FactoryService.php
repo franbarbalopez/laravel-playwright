@@ -11,10 +11,10 @@ class FactoryService
      */
     public function buildFactory(
         string $model,
-        int $count,
-        array $relationships,
-        array $attributes,
-        array $states,
+        int $count = 1,
+        array $relationships = [],
+        array $attributes = [],
+        array $states = [],
         array $load = []
     ) {
         $factory = $model::factory()->count($count);
@@ -85,9 +85,9 @@ class FactoryService
     {
         $relatedFactory = $this->buildRelatedFactory(
             $relationship['related'],
+            $relationship['count'] ?? 1,
             $relationship['states'] ?? [],
             $relationship['attributes'] ?? [],
-            $relationship['count'] ?? 1
         );
 
         return $factory->has($relatedFactory, $relationship['name'] ?? null);
@@ -109,9 +109,9 @@ class FactoryService
         }
         $relatedFactory = $this->buildRelatedFactory(
             $relationship['related'],
+            $relationship['count'] ?? 1,
             $relationship['states'] ?? [],
             $relationship['attributes'] ?? [],
-            $relationship['count'] ?? 1
         );
 
         return $factory->hasAttached(
@@ -126,9 +126,9 @@ class FactoryService
      */
     protected function buildRelatedFactory(
         string $modelClass,
+        int $count = 1,
         array $states = [],
         array $attributes = [],
-        int $count = 1
     ): Factory {
         $factory = $modelClass::factory()->count($count);
 

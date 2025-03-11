@@ -50,6 +50,9 @@ abstract class TestCase extends BaseTestCase
         $router->group(['middleware' => 'web'], function ($router) {
             $router->get('__playwright__/csrf-token', [PlaywrightController::class, 'csrfToken'])->name('playwright.csrf-token');
             $router->post('__playwright__/factory', [PlaywrightController::class, 'factory'])->name('playwright.factory');
+            $router->post('__playwright__/login', [PlaywrightController::class, 'login'])->name('playwright.login');
+            $router->post('__playwright__/logout', [PlaywrightController::class, 'logout'])->name('playwright.logout');
+            $router->get('__playwright__/user', [PlaywrightController::class, 'user'])->name('playwright.user');
         });
     }
 }
