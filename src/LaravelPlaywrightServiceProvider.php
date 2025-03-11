@@ -16,7 +16,7 @@ class LaravelPlaywrightServiceProvider extends ServiceProvider
             return;
         }
 
-        Route::middleware('web')->group(function () {
+        Route::middleware('web')->group(function (): void {
             $this->loadRoutesFrom(__DIR__.'/../routes/playwright.php');
         });
 
