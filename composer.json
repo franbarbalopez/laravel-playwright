@@ -9,7 +9,11 @@
     "require-dev": {
         "pestphp/pest": "^3.7",
         "orchestra/testbench": "^9.0|^10.0",
-        "nunomaduro/collision": "^8.6"
+        "nunomaduro/collision": "^8.6",
+        "laravel/pint": "^1.21",
+        "rector/rector": "^2.0",
+        "peckphp/peck": "^0.1.2",
+        "larastan/larastan": "^3.0"
     },
     "license": "MIT",
     "autoload": {
@@ -56,6 +60,10 @@
             "@build",
             "@php vendor/bin/testbench serve --ansi"
         ],
+        "refactor": "rector",
+        "lint": "pint",
+        "test:typos": "peck",
+        "test:static": "phpstan analyse --ansi",
         "test": [
             "@clear",
             "@php vendor/bin/pest"

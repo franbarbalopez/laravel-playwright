@@ -10,18 +10,11 @@ class PlaywrightController
 {
     /**
      * Create a new controller instance.
-     *
-     * @param FactoryService $factoryService
      */
-    public function __construct(private FactoryService $factoryService)
-    {
-        $this->factoryService = $factoryService;
-    }
+    public function __construct(private readonly FactoryService $factoryService) {}
 
     /**
      * Get the CSRF token.
-     * 
-     * @return JsonResponse
      */
     public function csrfToken(): JsonResponse
     {
@@ -30,9 +23,6 @@ class PlaywrightController
 
     /**
      * Create models using factory.
-     * 
-     * @param Request $request
-     * @return JsonResponse
      */
     public function factory(Request $request): JsonResponse
     {
@@ -43,7 +33,7 @@ class PlaywrightController
             $attributes = $request->input('attributes', []);
             $states = $request->input('states', []);
             $load = $request->input('load', []);
-            
+
             $result = $this->factoryService->buildFactory(
                 $model,
                 $count,
@@ -52,7 +42,7 @@ class PlaywrightController
                 $states,
                 $load
             );
-            
+
             return response()->json($result);
         } catch (\Exception $e) {
             return response()->json([

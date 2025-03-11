@@ -3,8 +3,6 @@
 namespace Workbench\Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Workbench\App\Models\Post;
-use Workbench\App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Workbench\Database\Factories\UserFactory;
 

@@ -3,17 +3,17 @@
 namespace FranBarbaLopez\LaravelPlaywright\Tests;
 
 use FranBarbaLopez\LaravelPlaywright\Http\Controllers\PlaywrightController;
-use Orchestra\Testbench\TestCase as BaseTestCase;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Routing\Router;
 use Orchestra\Testbench\Attributes\WithEnv;
 use Orchestra\Testbench\Concerns\WithWorkbench;
-use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Orchestra\Testbench\TestCase as BaseTestCase;
 
 #[WithEnv('DB_CONNECTION', 'testing')]
 abstract class TestCase extends BaseTestCase
 {
-    use WithWorkbench, RefreshDatabase;
+    use RefreshDatabase, WithWorkbench;
 
     protected function setUp(): void
     {
@@ -32,7 +32,7 @@ abstract class TestCase extends BaseTestCase
      * @param  \Illuminate\Foundation\Application  $app
      * @return array<int, class-string<\Illuminate\Support\ServiceProvider>>
      */
-    protected function getPackageProviders($app) 
+    protected function getPackageProviders($app)
     {
         return [
             'FranBarbaLopez\LaravelPlaywright\LaravelPlaywrightServiceProvider',
@@ -45,7 +45,7 @@ abstract class TestCase extends BaseTestCase
      * @param  Router  $router
      * @return void
      */
-    protected function defineRoutes($router) 
+    protected function defineRoutes($router)
     {
         $router->group(['middleware' => 'web'], function ($router) {
             $router->get('__playwright__/csrf-token', [PlaywrightController::class, 'csrfToken'])->name('playwright.csrf-token');

@@ -14,7 +14,7 @@ class LaravelPlaywrightServiceProvider extends ServiceProvider
         if ($this->app->environment('production')) {
             return;
         }
-        
+
         $this->loadRoutesFrom(__DIR__.'/../routes/playwright.php');
     }
 }

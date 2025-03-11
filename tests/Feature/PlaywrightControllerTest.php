@@ -37,10 +37,9 @@ test('creates a new model with custom attributes', function () {
         ],
     ])
         ->assertOk()
-        ->assertJson(fn (AssertableJson $json) => 
-            $json->where('name', 'John Doe')
-                ->where('email', 'johndoe@example.com')
-                ->etc()
+        ->assertJson(fn (AssertableJson $json) => $json->where('name', 'John Doe')
+            ->where('email', 'johndoe@example.com')
+            ->etc()
         );
 });
 
@@ -50,9 +49,8 @@ test('creates a new model with states', function () {
         'states' => ['unverified'],
     ])
         ->assertOk()
-        ->assertJson(fn (AssertableJson $json) => 
-            $json->where('email_verified_at', null)
-                ->etc()
+        ->assertJson(fn (AssertableJson $json) => $json->where('email_verified_at', null)
+            ->etc()
         );
 });
 
@@ -81,16 +79,13 @@ test('creates a new model using has method', function () {
         ],
     ])
         ->assertOk()
-        ->assertJson(fn (AssertableJson $json) => 
-            $json->has('posts', 3, fn (AssertableJson $json) => 
-                $json->where('title', 'Post Title')
-                    ->where('published_at', fn ($value) => 
-                        Carbon::parse($value)->format('Y-m-d H:i:s') === 
-                        now()->format('Y-m-d H:i:s')
-                    )
-                    ->etc()
+        ->assertJson(fn (AssertableJson $json) => $json->has('posts', 3, fn (AssertableJson $json) => $json->where('title', 'Post Title')
+            ->where('published_at', fn ($value) => Carbon::parse($value)->format('Y-m-d H:i:s') ===
+                now()->format('Y-m-d H:i:s')
             )
-                ->etc()
+            ->etc()
+        )
+            ->etc()
         );
 });
 
@@ -109,12 +104,10 @@ test('creates a new model using for method', function () {
         ],
     ])
         ->assertOk()
-        ->assertJson(fn (AssertableJson $json) => 
-            $json->has('user', fn (AssertableJson $json) => 
-                $json->where('name', 'John Doe')
-                    ->etc()
-            )
-                ->etc()
+        ->assertJson(fn (AssertableJson $json) => $json->has('user', fn (AssertableJson $json) => $json->where('name', 'John Doe')
+            ->etc()
+        )
+            ->etc()
         );
 
     // Using a model instance already created
@@ -133,12 +126,10 @@ test('creates a new model using for method', function () {
         ],
     ])
         ->assertOk()
-        ->assertJson(fn (AssertableJson $json) => 
-            $json->has('user', fn (AssertableJson $json) => 
-                $json->where('id', $user->id)
-                    ->etc()
-            )
-                ->etc()
+        ->assertJson(fn (AssertableJson $json) => $json->has('user', fn (AssertableJson $json) => $json->where('id', $user->id)
+            ->etc()
+        )
+            ->etc()
         );
 });
 
@@ -154,22 +145,19 @@ test('creates a new model with hasAttached method and new related models', funct
                 'count' => 2,
                 'attributes' => ['name' => 'Editor'],
                 'pivotAttributes' => [
-                    'assigned_at' => now()->toISOString()
+                    'assigned_at' => now()->toISOString(),
                 ],
             ],
         ],
     ])
         ->assertOk()
-        ->assertJson(fn (AssertableJson $json) => 
-            $json->has('roles', 2, fn (AssertableJson $json) => 
-                $json->where('name', 'Editor')
-                    ->has('pivot', fn (AssertableJson $json) => 
-                        $json->where('assigned_at', now()->toISOString())
-                            ->etc()
-                    )
-                    ->etc()
-            )
+        ->assertJson(fn (AssertableJson $json) => $json->has('roles', 2, fn (AssertableJson $json) => $json->where('name', 'Editor')
+            ->has('pivot', fn (AssertableJson $json) => $json->where('assigned_at', now()->toISOString())
                 ->etc()
+            )
+            ->etc()
+        )
+            ->etc()
         );
 });
 
@@ -185,21 +173,18 @@ test('creates a new model with hasAttached method and existing models', function
                 'name' => 'roles',
                 'model_ids' => $roles->pluck('id')->toArray(),
                 'pivotAttributes' => [
-                    'assigned_at' => now()->toISOString()
+                    'assigned_at' => now()->toISOString(),
                 ],
             ],
         ],
     ])
         ->assertOk()
-        ->assertJson(fn (AssertableJson $json) => 
-            $json->has('roles', 2, fn (AssertableJson $json) => 
-                $json->has('pivot', fn (AssertableJson $json) => 
-                    $json->where('assigned_at', now()->toISOString())
-                        ->etc()
-                )
-                ->etc()
-            )
-                ->etc()
+        ->assertJson(fn (AssertableJson $json) => $json->has('roles', 2, fn (AssertableJson $json) => $json->has('pivot', fn (AssertableJson $json) => $json->where('assigned_at', now()->toISOString())
+            ->etc()
+        )
+            ->etc()
+        )
+            ->etc()
         );
 });
 
@@ -218,10 +203,9 @@ test('handles error when model_id does not exist', function () {
         ],
     ])
         ->assertStatus(500)
-        ->assertJson(fn (AssertableJson $json) => 
-            $json->has('error')
-                ->where('error', "Model Workbench\App\Models\User with ID {$nonExistentId} not found")
-                ->etc()
+        ->assertJson(fn (AssertableJson $json) => $json->has('error')
+            ->where('error', "Model Workbench\App\Models\User with ID {$nonExistentId} not found")
+            ->etc()
         );
 });
 
@@ -237,15 +221,14 @@ test('handles error when invalid method is provided', function () {
         ],
     ])
         ->assertStatus(500)
-        ->assertJson(fn (AssertableJson $json) => 
-            $json->has('error')
-                ->etc()
+        ->assertJson(fn (AssertableJson $json) => $json->has('error')
+            ->etc()
         );
 });
 
 test('creates a model with multiple relationship types', function () {
     $role = Role::factory()->create(['name' => 'Admin']);
-    
+
     $this->postJson(route('playwright.factory'), [
         'model' => 'Workbench\App\Models\User',
         'load' => ['posts', 'profile', 'roles'],
@@ -268,21 +251,20 @@ test('creates a model with multiple relationship types', function () {
                 'name' => 'roles',
                 'model_ids' => [$role->id],
                 'pivotAttributes' => ['assigned_at' => now()->toISOString()],
-            ]
+            ],
         ],
     ])
         ->assertOk()
-        ->assertJson(fn (AssertableJson $json) => 
-            $json->has('posts', 2)
-                ->has('profile')
-                ->has('roles', 1)
-                ->etc()
+        ->assertJson(fn (AssertableJson $json) => $json->has('posts', 2)
+            ->has('profile')
+            ->has('roles', 1)
+            ->etc()
         );
 });
 
 test('creates a model with relationships having multiple states', function () {
     $now = now()->toISOString();
-    
+
     $this->postJson(route('playwright.factory'), [
         'model' => 'Workbench\App\Models\User',
         'load' => ['posts'],
@@ -295,33 +277,30 @@ test('creates a model with relationships having multiple states', function () {
                 'states' => ['published', 'featured'],
                 'attributes' => [
                     'title' => 'Featured Post',
-                    'published_at' => $now
+                    'published_at' => $now,
                 ],
             ],
         ],
     ])
         ->assertOk()
-        ->assertJson(fn (AssertableJson $json) => 
-            $json->has('posts', 2, fn (AssertableJson $json) => 
-                $json->where('title', 'Featured Post')
-                    ->where('published_at', fn ($value) => 
-                        Carbon::parse($value)->format('Y-m-d H:i:s') === 
-                        now()->format('Y-m-d H:i:s')
-                    )
-                    ->where('is_featured', true)
-                    ->etc()
+        ->assertJson(fn (AssertableJson $json) => $json->has('posts', 2, fn (AssertableJson $json) => $json->where('title', 'Featured Post')
+            ->where('published_at', fn ($value) => Carbon::parse($value)->format('Y-m-d H:i:s') ===
+                now()->format('Y-m-d H:i:s')
             )
-                ->etc()
+            ->where('is_featured', true)
+            ->etc()
+        )
+            ->etc()
         );
 });
 
 test('handles gracefully when optional parameters are empty', function () {
     $this->postJson(route('playwright.factory'), [
         'model' => 'Workbench\App\Models\User',
-        'relationships' => [], 
-        'attributes' => [],    
-        'states' => [],        
-        'load' => [],          
+        'relationships' => [],
+        'attributes' => [],
+        'states' => [],
+        'load' => [],
     ])
         ->assertOk()
         ->assertJsonStructure(['id', 'name', 'email']);
