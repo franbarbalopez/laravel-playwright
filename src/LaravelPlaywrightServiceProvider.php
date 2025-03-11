@@ -20,6 +20,10 @@ class LaravelPlaywrightServiceProvider extends ServiceProvider
             $this->loadRoutesFrom(__DIR__.'/../routes/playwright.php');
         });
 
-        // TODO: Publish the Javascript Compiled from Typescript helper
+        $this->publishes([
+            __DIR__.'/../dist/laravel-playwright.es.js' => public_path('vendor/playwright.js'),
+            __DIR__.'/../dist/laravel-playwright.umd.js' => public_path('vendor/playwright.umd.js'),
+            __DIR__.'/../dist/types/laravel-playwright.d.ts' => public_path('vendor/playwright.d.ts'),
+        ], 'laravel-playwright-assets');
     }
 }

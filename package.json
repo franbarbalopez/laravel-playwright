@@ -1,0 +1,38 @@
+{
+  "name": "@franbarbalopez/laravel-playwright",
+  "version": "1.0.0",
+  "main": "dist/laravel-playwright.umd.js",
+  "module": "dist/laravel-playwright.js",
+  "types": "dist/types/laravel-playwright.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/laravel-playwright.d.ts",
+      "import": "./dist/laravel-playwright.js",
+      "require": "./dist/laravel-playwright.umd.js"
+    }
+  },
+  "scripts": {
+    "build": "vite build && tsc --emitDeclarationOnly"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/franbarbalopez/laravel-playwright.git"
+  },
+  "keywords": ["laravel", "playwright", "testing"],
+  "author": "Francisco José Barba López",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/franbarbalopez/laravel-playwright/issues"
+  },
+  "homepage": "https://github.com/franbarbalopez/laravel-playwright#readme",
+  "description": "Laravel helpers for Playwright testing",
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "@types/node": "^22.13.10",
+    "typescript": "^5.8.2",
+    "vite": "^6.2.1"
+  },
+  "peerDependencies": {
+    "@playwright/test": "^1.30.0 || ^1.40.0"
+  }
+}

@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+      "target": "ES2018",
+      "module": "ESNext",
+      "moduleResolution": "Node",
+      "esModuleInterop": true,
+      "strict": true,
+      "declaration": true,
+      "declarationDir": "./dist/types",
+      "outDir": "./dist",
+      "paths": {
+        "@playwright-helpers": ["/vendor/playwright"]
+      }
+    },
+    "include": ["resources/js/**/*.ts"]
+  }
