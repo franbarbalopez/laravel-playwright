@@ -12,7 +12,6 @@
         "nunomaduro/collision": "^8.6",
         "laravel/pint": "^1.21",
         "rector/rector": "^2.0",
-        "peckphp/peck": "^0.1.2",
         "larastan/larastan": "^3.0"
     },
     "license": "MIT",
@@ -62,7 +61,6 @@
         ],
         "refactor": "rector",
         "lint": "pint",
-        "test:typos": "peck",
         "test:static": "phpstan analyse --ansi",
         "test": [
             "@clear",
