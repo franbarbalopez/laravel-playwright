@@ -3,21 +3,11 @@
 namespace FranBarbaLopez\LaravelPlaywright\Services;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
 
 class FactoryService
 {
     /**
      * Build a factory with all relationships and configurations.
-     *
-     * @param string $model
-     * @param int $count
-     * @param array $relationships
-     * @param array $attributes
-     * @param array $states
-     * @param array $load
-     * @return Model|Collection
      */
     public function buildFactory(
         string $model, 
@@ -43,32 +33,28 @@ class FactoryService
     }
     
     /**
-     * Apply a single relationship configuration to a factory.
-     *
-     * @param Factory $factory
-     * @param array $relationship
-     * @return Factory
+     * Apply a relationship using the specified factory method.
      */
     protected function applyRelationship(Factory $factory, array $relationship): Factory
     {
-        $type = $relationship['type'] ?? '';
+        $method = $relationship['method'] ?? '';
         
-        return match ($type) {
-            'BelongsTo' => $this->applyBelongsToRelationship($factory, $relationship),
-            'HasMany' => $this->applyHasManyRelationship($factory, $relationship),
-            'BelongsToMany' => $this->applyBelongsToManyRelationship($factory, $relationship),
-            default => $factory,
+        if (!method_exists($factory, $method)) {
+            throw new \InvalidArgumentException("Factory method '{$method}' does not exist");
+        }
+        
+        return match ($method) {
+            'for' => $this->applyForRelationship($factory, $relationship),
+            'has' => $this->applyHasRelationship($factory, $relationship),
+            'hasAttached' => $this->applyHasAttachedRelationship($factory, $relationship),
+            default => throw new \InvalidArgumentException("Unsupported factory method: {$method}")
         };
     }
     
     /**
-     * Apply a BelongsTo relationship to the factory.
-     *
-     * @param Factory $factory
-     * @param array $relationship
-     * @return Factory
+     * Apply a "for" relationship (BelongsTo).
      */
-    protected function applyBelongsToRelationship(Factory $factory, array $relationship): Factory
+    protected function applyForRelationship(Factory $factory, array $relationship): Factory
     {
         if (isset($relationship['model_id'])) {
             $relatedModel = $relationship['related']::find($relationship['model_id']);
@@ -76,81 +62,86 @@ class FactoryService
             if ($relatedModel) {
                 return $factory->for($relatedModel, $relationship['name']);
             }
+            
+            throw new \InvalidArgumentException(
+                "Model {$relationship['related']} with ID {$relationship['model_id']} not found"
+            );
         } else {
             $relatedFactory = $relationship['related']::factory();
             
-            if (isset($relationship['states'])) {
-                foreach ($relationship['states'] as $state) {
-                    $relatedFactory = $relatedFactory->$state();
-                }
-            }
-            
-            $relatedFactory = $relatedFactory->state($relationship['attributes'] ?? []);
-            return $factory->for($relatedFactory, $relationship['name']);
-        }
-        
-        return $factory;
-    }
-    
-    /**
-     * Apply a HasMany relationship to the factory.
-     *
-     * @param Factory $factory
-     * @param array $relationship
-     * @return Factory
-     */
-    protected function applyHasManyRelationship(Factory $factory, array $relationship): Factory
-    {
-        $relatedFactory = $relationship['related']::factory()->count($relationship['count'] ?? 1);
-        
-        if (isset($relationship['states'])) {
-            foreach ($relationship['states'] as $state) {
+            foreach ($relationship['states'] ?? [] as $state) {
                 $relatedFactory = $relatedFactory->$state();
             }
+            
+            if (!empty($relationship['attributes'])) {
+                $relatedFactory = $relatedFactory->state($relationship['attributes']);
+            }
+            
+            return $factory->for($relatedFactory, $relationship['name']);
         }
-        
-        $relatedFactory = $relatedFactory->state($relationship['attributes'] ?? []);
-        return $factory->has($relatedFactory, $relationship['name']);
     }
     
     /**
-     * Apply a BelongsToMany relationship to the factory.
-     *
-     * @param Factory $factory
-     * @param array $relationship
-     * @return Factory
+     * Apply a "has" relationship (HasOne, HasMany, etc).
      */
-    protected function applyBelongsToManyRelationship(Factory $factory, array $relationship): Factory
+    protected function applyHasRelationship(Factory $factory, array $relationship): Factory
     {
-        if (isset($relationship['attach_existing']) && $relationship['attach_existing']) {
-            if (isset($relationship['model_ids']) && is_array($relationship['model_ids'])) {
-                $pivotAttributes = $relationship['pivotAttributes'] ?? [];
-                
-                $attachData = collect($relationship['model_ids'])->mapWithKeys(function ($id) use ($pivotAttributes) {
-                    return [$id => $pivotAttributes];
-                })->toArray();
-                
-                return $factory->hasAttached(
-                    $relationship['name'], 
-                    $attachData
-                );
-            }
+        $relatedFactory = $this->buildRelatedFactory(
+            $relationship['related'], 
+            $relationship['states'] ?? [], 
+            $relationship['attributes'] ?? [],
+            $relationship['count'] ?? 1
+        );
+        
+        return $factory->has($relatedFactory, $relationship['name'] ?? null);
+    }
+    
+    /**
+     * Apply a "hasAttached" relationship (BelongsToMany).
+     */
+    protected function applyHasAttachedRelationship(Factory $factory, array $relationship): Factory
+    {
+        if (isset($relationship['model_ids']) && is_array($relationship['model_ids'])) {
+            $pivotAttributes = $relationship['pivotAttributes'] ?? [];
+            
+            return $factory->hasAttached(
+                $relationship['model_ids'],
+                $pivotAttributes,
+                $relationship['name'],
+            );
         } else {
-            $relatedFactory = $relationship['related']::factory()->count($relationship['count'] ?? 1);
-            
-            if (isset($relationship['states'])) {
-                foreach ($relationship['states'] as $state) {
-                    $relatedFactory = $relatedFactory->$state();
-                }
-            }
-            
-            $relatedFactory = $relatedFactory->state($relationship['attributes'] ?? []);
+            $relatedFactory = $this->buildRelatedFactory(
+                $relationship['related'], 
+                $relationship['states'] ?? [], 
+                $relationship['attributes'] ?? [],
+                $relationship['count'] ?? 1
+            );
             
             return $factory->hasAttached(
                 $relatedFactory,
                 $relationship['pivotAttributes'] ?? [],
-                $relationship['name']
+                $relationship['name'] ?? null
             );
+        }
+    }
+    
+    /**
+     * Helper method to build a related factory with states and attributes.
+     */
+    protected function buildRelatedFactory(
+        string $modelClass, 
+        array $states = [], 
+        array $attributes = [], 
+        int $count = 1
+    ): Factory {
+        $factory = $modelClass::factory()->count($count);
+        
+        foreach ($states as $state) {
+            $factory = $factory->$state();
+        }
+        
+        if (!empty($attributes)) {
+            $factory = $factory->state($attributes);
         }
         
         return $factory;

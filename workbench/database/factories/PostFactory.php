@@ -32,6 +32,7 @@ class PostFactory extends Factory
             'title' => fake()->sentence(),
             'content' => fake()->paragraph(),
             'published_at' => null,
+            'is_featured' => false,
         ];
     }
 
@@ -42,6 +43,16 @@ class PostFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'published_at' => now(),
+        ]);
+    }
+
+    /**
+     * Indicate that the post is featured.
+     */
+    public function featured(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_featured' => true,
         ]);
     }
 }

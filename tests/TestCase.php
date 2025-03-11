@@ -19,6 +19,8 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
+        $this->freezeTime();
+
         Factory::guessFactoryNamesUsing(function (string $modelName) {
             return 'Workbench\\Database\\Factories\\'.class_basename($modelName).'Factory';
         });
