@@ -67,10 +67,13 @@ class FactoryService
                 "Model {$relationship['related']} with ID {$relationship['model_id']} not found"
             );
         }
+        
         $relatedFactory = $relationship['related']::factory();
+
         foreach ($relationship['states'] ?? [] as $state) {
             $relatedFactory = $relatedFactory->$state();
         }
+
         if (! empty($relationship['attributes'])) {
             $relatedFactory = $relatedFactory->state($relationship['attributes']);
         }

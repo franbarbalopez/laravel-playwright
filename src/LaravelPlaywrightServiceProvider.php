@@ -2,6 +2,7 @@
 
 namespace FranBarbaLopez\LaravelPlaywright;
 
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
 class LaravelPlaywrightServiceProvider extends ServiceProvider
@@ -15,6 +16,10 @@ class LaravelPlaywrightServiceProvider extends ServiceProvider
             return;
         }
 
-        $this->loadRoutesFrom(__DIR__.'/../routes/playwright.php');
+        Route::middleware('web')->group(function () {
+            $this->loadRoutesFrom(__DIR__.'/../routes/playwright.php');
+        });
+
+        // TODO: Publish the Javascript Compiled from Typescript helper
     }
 }
