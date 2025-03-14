@@ -41,7 +41,21 @@ class Install extends Command
     public function handle(): void
     {
         if (! $this->isPlaywrightInstalled()) {
-            $this->proposePlaywrightInstallation();
+            if ($this->confirm('Playwright is not installed. Would you like to install it?', false)) {
+                $packageManager = $this->choice('Which package manager would you like to use?', ['npm', 'yarn', 'pnpm'], 0);
+            
+                $this->comment('Installing Playwright...');
+    
+                match ($packageManager) {
+                    'npm' => Process::tty()->run('npm init playwright@latest'),
+                    'yarn' => Process::tty()->run('yarn create playwright'),
+                    'pnpm' => Process::tty()->run('pnpm create playwright'),
+                };
+            } else {
+                $this->error('Playwright is required to install Laravel Playwright.');
+    
+                return;
+            }
         }
 
         $this->comment('Publishing Laravel Playwright Assets...');
@@ -60,24 +74,5 @@ class Install extends Command
         $packageJson = json_decode($this->files->get(base_path('package.json')), true);
 
         return Arr::get($packageJson, 'devDependencies.@playwright/test') || Arr::get($packageJson, 'dependencies.@playwright/test');
-    }
-
-    private function proposePlaywrightInstallation(): void
-    {
-        if ($this->confirm('Playwright is not installed. Would you like to install it?', false)) {
-            $packageManager = $this->choice('Which package manager would you like to use?', ['npm', 'yarn', 'pnpm'], 0);
-        
-            $this->comment('Installing Playwright...');
-
-            match ($packageManager) {
-                'npm' => Process::tty()->run('npm init playwright@latest'),
-                'yarn' => Process::tty()->run('yarn create playwright'),
-                'pnpm' => Process::tty()->run('pnpm create playwright'),
-            };
-        } else {
-            $this->warn('Playwright is required to install Laravel Playwright.');
-
-            return;
-        }
     }
 }
