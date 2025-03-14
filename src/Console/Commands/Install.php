@@ -48,6 +48,8 @@ class Install extends Command
     {
         $packageJson = json_decode(base_path('package.json'), true);
 
+        dd($packageJson);
+
         return Arr::get($packageJson, 'devDependencies.@playwright/test') || Arr::get($packageJson, 'dependencies.@playwright/test');
     }
 
@@ -59,9 +61,15 @@ class Install extends Command
             $this->comment('Installing Playwright...');
 
             match ($packageManager) {
-                'npm' => Process::run('npm init playwright@latest'),
-                'yarn' => Process::run('yarn create playwright'),
-                'pnpm' => Process::run('pnpm create playwright'),
+                'npm' => Process::run('npm init playwright@latest', function (string $type, string $output): void {
+                    echo $output;
+                }),
+                'yarn' => Process::run('yarn create playwright', function (string $type, string $output): void {
+                    echo $output;
+                }),
+                'pnpm' => Process::run('pnpm create playwright', function (string $type, string $output): void {
+                    echo $output;
+                }),
             };
         } else {
             $this->warn('Playwright is required to install Laravel Playwright.');
