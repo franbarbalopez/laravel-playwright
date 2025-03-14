@@ -4,6 +4,7 @@ namespace FranBarbaLopez\LaravelPlaywright\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Process;
 
 class Install extends Command
 {
@@ -58,9 +59,9 @@ class Install extends Command
             $this->comment('Installing Playwright...');
 
             match ($packageManager) {
-                'npm' => $this->callSilently('npm init playwright@latest'),
-                'yarn' => $this->callSilently('yarn create playwright'),
-                'pnpm' => $this->callSilently('pnpm create playwright'),
+                'npm' => Process::run('npm init playwright@latest'),
+                'yarn' => Process::run('yarn create playwright'),
+                'pnpm' => Process::run('pnpm create playwright'),
             };
         } else {
             $this->warn('Playwright is required to install Laravel Playwright.');
