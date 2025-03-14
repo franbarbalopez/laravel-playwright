@@ -3,6 +3,7 @@
 namespace FranBarbaLopez\LaravelPlaywright\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Process;
 
@@ -21,6 +22,16 @@ class Install extends Command
      * @var string
      */
     protected $description = 'Install all of the Laravel Playwright resources';
+
+    /**
+     * Create a new command instance.
+     *
+     * @return void
+     */
+    public function __construct(private Filesystem $files)
+    {
+        parent::__construct();
+    }
 
     /**
      * Execute the console command.
@@ -46,9 +57,7 @@ class Install extends Command
      */
     private function isPlaywrightInstalled(): bool
     {
-        $packageJson = json_decode(base_path('package.json'), true);
-
-        dd($packageJson);
+        $packageJson = json_decode($this->files->get(base_path('package.json')), true);
 
         return Arr::get($packageJson, 'devDependencies.@playwright/test') || Arr::get($packageJson, 'dependencies.@playwright/test');
     }
