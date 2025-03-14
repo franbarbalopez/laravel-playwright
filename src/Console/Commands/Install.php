@@ -70,15 +70,9 @@ class Install extends Command
             $this->comment('Installing Playwright...');
 
             match ($packageManager) {
-                'npm' => Process::run('npm init playwright@latest', function (string $type, string $output): void {
-                    echo $output;
-                }),
-                'yarn' => Process::run('yarn create playwright', function (string $type, string $output): void {
-                    echo $output;
-                }),
-                'pnpm' => Process::run('pnpm create playwright', function (string $type, string $output): void {
-                    echo $output;
-                }),
+                'npm' => Process::tty()->run('npm init playwright@latest'),
+                'yarn' => Process::tty()->run('yarn create playwright'),
+                'pnpm' => Process::tty()->run('pnpm create playwright'),
             };
         } else {
             $this->warn('Playwright is required to install Laravel Playwright.');
