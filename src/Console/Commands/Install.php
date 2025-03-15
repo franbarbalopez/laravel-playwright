@@ -57,9 +57,9 @@ class Install extends Command
         }
 
         $paths = [
-            'e2e' => $this->files->exists(base_path('e2e')),
-            'tests/e2e' => $this->files->exists(base_path('tests/e2e')),
-            'tests/Browser' => $this->files->exists(base_path('tests/Browser')),
+            'e2e' => (int) $this->files->exists(base_path('e2e')),
+            'tests/e2e' => (int) $this->files->exists(base_path('tests/e2e')),
+            'tests/Browser' => (int) $this->files->exists(base_path('tests/Browser')),
         ];
 
         $path = trim(strtolower((string) $this->ask('Whats the path of your Playwright tests?', array_flip($paths)[true] ?? 'e2e')));
