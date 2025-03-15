@@ -58,10 +58,19 @@ class Install extends Command
             }
         }
 
-        $this->comment('Publishing Laravel Playwright Assets...');
-        $this->callSilently('vendor:publish', ['--tag' => 'laravel-playwright-assets']);
+        $paths = [
+            'e2e' => $this->files->exists(base_path('e2e')),
+            'tests/e2e' => $this->files->exists(base_path('tests/e2e')),
+            'tests/Browser' => $this->files->exists(base_path('tests/Browser')),
+        ];
 
-        $this->info('Laravel Playwright scaffolding installed successfully.');
+        $path = trim(strtolower($this->ask('Whats the path of your Playwright tests?', array_flip($paths)[true] ?? 'e2e')));
+
+        $this->comment('Publishing Laravel Playwright helper functions...');
+
+        $this->files->copyDirectory(__DIR__.'/dist', base_path($path));
+        
+        $this->info('Laravel Playwright helper published successfully.');
     }
 
     /**
