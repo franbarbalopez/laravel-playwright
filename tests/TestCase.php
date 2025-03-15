@@ -3,7 +3,6 @@
 namespace FranBarbaLopez\LaravelPlaywright\Tests;
 
 use FranBarbaLopez\LaravelPlaywright\Http\Controllers\PlaywrightController;
-use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Routing\Router;
 use Orchestra\Testbench\Attributes\WithEnv;
@@ -20,10 +19,6 @@ abstract class TestCase extends BaseTestCase
         parent::setUp();
 
         $this->freezeTime();
-
-        Factory::guessFactoryNamesUsing(function (string $modelName) {
-            return 'Workbench\\Database\\Factories\\'.class_basename($modelName).'Factory';
-        });
     }
 
     /**

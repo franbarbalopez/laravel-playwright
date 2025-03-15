@@ -28,24 +28,22 @@ class Install extends Command
      *
      * @return void
      */
-    public function __construct(private Filesystem $files)
+    public function __construct(private readonly Filesystem $files)
     {
         parent::__construct();
     }
 
     /**
      * Execute the console command.
-     *
-     * @return void
      */
     public function handle(): void
     {
         if (! $this->isPlaywrightInstalled()) {
             if ($this->confirm('Playwright is not installed. Would you like to install it?', false)) {
                 $packageManager = $this->choice('Which package manager would you like to use?', ['npm', 'yarn', 'pnpm'], 0);
-            
+
                 $this->comment('Installing Playwright...');
-    
+
                 match ($packageManager) {
                     'npm' => Process::tty()->run('npm init playwright@latest'),
                     'yarn' => Process::tty()->run('yarn create playwright'),
@@ -53,26 +51,37 @@ class Install extends Command
                 };
             } else {
                 $this->error('Playwright is required to install Laravel Playwright.');
-    
+
                 return;
             }
         }
 
-        $this->comment('Publishing Laravel Playwright Assets...');
-        $this->callSilently('vendor:publish', ['--tag' => 'laravel-playwright-assets']);
+        $paths = [
+            'e2e' => $this->files->exists(base_path('e2e')),
+            'tests/e2e' => $this->files->exists(base_path('tests/e2e')),
+            'tests/Browser' => $this->files->exists(base_path('tests/Browser')),
+        ];
 
-        $this->info('Laravel Playwright scaffolding installed successfully.');
+        $path = trim(strtolower((string) $this->ask('Whats the path of your Playwright tests?', array_flip($paths)[true] ?? 'e2e')));
+
+        $this->comment('Publishing Laravel Playwright helper functions...');
+
+        $this->files->copyDirectory(__DIR__.'/dist', base_path($path));
+
+        $this->info('Laravel Playwright helper published successfully.');
     }
 
     /**
      * Determine if Playwright is installed.
-     * 
-     * @return bool
      */
     private function isPlaywrightInstalled(): bool
     {
         $packageJson = json_decode($this->files->get(base_path('package.json')), true);
 
-        return Arr::get($packageJson, 'devDependencies.@playwright/test') || Arr::get($packageJson, 'dependencies.@playwright/test');
+        if (Arr::get($packageJson, 'devDependencies.@playwright/test')) {
+            return true;
+        }
+
+        return (bool) Arr::get($packageJson, 'dependencies.@playwright/test');
     }
 }

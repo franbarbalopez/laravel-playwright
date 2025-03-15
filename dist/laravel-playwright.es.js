@@ -1,38 +1,40 @@
-async function e(t) {
-  return await (await t.request.get("/__playwright__/csrf_token")).json();
+async function e({ page: t }) {
+  return await (await t.request.get("/__playwright__/csrf_token", { headers: { Accept: "application/json" } })).json();
 }
-async function a(t, n) {
+async function a({ page: t, options: n }) {
+  const o = await e({ page: t });
   return await (await t.request.post("/__playwright__/factory", {
-    data: n,
-    headers: {
-      "Content-Type": "application/json",
-      "X-CSRF-TOKEN": await e(t)
+    headers: { Accept: "application/json" },
+    data: {
+      _token: o,
+      options: n
     }
   })).json();
 }
-async function o(t, n) {
+async function r({ page: t, options: n }) {
+  const o = await e({ page: t });
   return await (await t.request.post("/__playwright__/login", {
-    data: n || {},
-    headers: {
-      "Content-Type": "application/json",
-      "X-CSRF-TOKEN": await e(t)
+    headers: { Accept: "application/json" },
+    data: {
+      _token: o,
+      options: n || {}
     }
   })).json();
 }
-async function r(t) {
+async function c({ page: t }) {
+  const n = await e({ page: t });
   await t.request.post("/__playwright__/logout", {
-    headers: {
-      "X-CSRF-TOKEN": await e(t)
-    }
+    headers: { Accept: "application/json" },
+    data: { _token: n }
   });
 }
-async function i(t) {
-  return await (await t.request.get("/__playwright__/user")).json();
+async function i({ page: t }) {
+  return await (await t.request.get("/__playwright__/user", { headers: { Accept: "application/json" } })).json();
 }
 export {
+  e as csrfToken,
   a as factory,
-  e as getCsrfToken,
-  i as getUser,
-  o as login,
-  r as logout
+  r as login,
+  c as logout,
+  i as user
 };
