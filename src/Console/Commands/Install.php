@@ -66,9 +66,17 @@ class Install extends Command
 
         $this->comment('Publishing Laravel Playwright helper functions...');
 
-        $this->files->copyDirectory(__DIR__.'/../../../dist', base_path($path).'/laravel-playwright');
+        $this->files->copy(__DIR__.'/../../../dist/laravel-playwright.umd.js', base_path($path).'/laravel-playwright.js');
 
         $this->info('Laravel Playwright helper published successfully.');
+
+        if ($this->files->exists(base_path('tsconfig.json'))) {
+            $this->files->copy(__DIR__.'/../../../dist/types/laravel-playwright.d.ts', base_path($path).'/laravel-playwright.d.ts');
+
+            $this->info('TypeScript definitions published successfully.');
+        }
+
+        $this->info('Laravel Playwright installed successfully.');
     }
 
     /**
