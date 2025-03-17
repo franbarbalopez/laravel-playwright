@@ -1,33 +1,33 @@
 const e = {
   Accept: "application/json"
 };
-async function o(s) {
-  return (await s.request.get("/__playwright__/csrf_token", {
+async function o(t) {
+  return (await t.request.get("/__playwright__/csrf_token", {
     headers: e
   })).json();
 }
-async function a(s, t) {
-  const n = await o(s);
-  return (await s.request.post("/__playwright__/factory", {
+async function a(t, s) {
+  const n = await o(t);
+  return (await t.request.post("/__playwright__/factory", {
     headers: { ...e, "X-CSRF-TOKEN": n },
-    ...t
+    data: s
   })).json();
 }
-async function c(s, t) {
-  const n = await o(s);
-  return (await s.request.post("/__playwright__/login", {
+async function c(t, s) {
+  const n = await o(t);
+  return (await t.request.post("/__playwright__/login", {
     headers: { ...e, "X-CSRF-TOKEN": n },
-    ...t || {}
+    data: s || {}
   })).json();
 }
-async function i(s) {
-  const t = await o(s);
-  await s.request.post("/__playwright__/logout", {
-    headers: { ...e, "X-CSRF-TOKEN": t }
+async function i(t) {
+  const s = await o(t);
+  await t.request.post("/__playwright__/logout", {
+    headers: { ...e, "X-CSRF-TOKEN": s }
   });
 }
-async function _(s) {
-  return (await s.request.get("/__playwright__/user", {
+async function _(t) {
+  return (await t.request.get("/__playwright__/user", {
     headers: e
   })).json();
 }

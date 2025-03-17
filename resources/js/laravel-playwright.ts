@@ -78,7 +78,7 @@ export async function factory<T = unknown>(
 
   const response = await page.request.post('/__playwright__/factory', {
     headers: { ...commonHeaders, 'X-CSRF-TOKEN': token },
-    ...options,
+    data: options,
   });
   
   return response.json() as T;
@@ -99,7 +99,7 @@ export async function login<T = unknown>(
 
   const response = await page.request.post('/__playwright__/login', {
     headers: { ...commonHeaders, 'X-CSRF-TOKEN': token },
-    ...(options || {}),
+    data: options || {},
   });
   
   return response.json() as T;
