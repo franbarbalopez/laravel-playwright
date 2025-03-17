@@ -6,8 +6,8 @@ export default defineConfig({
     lib: {
       entry: resolve(__dirname, 'resources/js/laravel-playwright.ts'),
       name: 'LaravelPlaywright',
-      fileName: 'laravel-playwright',
-      formats: ['umd'],
+      fileName: () => 'laravel-playwright.js',
+      formats: ['es'],
     },
     outDir: 'dist',
     emptyOutDir: true,
