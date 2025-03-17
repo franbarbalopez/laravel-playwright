@@ -66,6 +66,8 @@ class Install extends Command
 
         $this->comment('Publishing Laravel Playwright helper functions...');
 
+        dd(__DIR__.'/dist', base_path($path).'/laravel-playwright');
+
         $this->files->copyDirectory(__DIR__.'/dist', base_path($path).'/laravel-playwright');
 
         $this->info('Laravel Playwright helper published successfully.');
