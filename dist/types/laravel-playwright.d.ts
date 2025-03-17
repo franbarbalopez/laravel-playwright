@@ -1,67 +1,88 @@
 import type { Page } from '@playwright/test';
-type BaseRelationship = {
+/**
+ * Supported relationship methods
+ */
+export type RelationshipMethod = 'has' | 'for' | 'hasAttached';
+/**
+ * Common base for all relationships
+ */
+export interface BaseRelationship {
     name: string;
     related: string;
     count?: number;
-    states?: Array<string>;
+    states?: string[];
     attributes?: Record<string, unknown>;
-};
-type HasRelationship = BaseRelationship & {
-    method: 'has';
+    method: RelationshipMethod;
+}
+/**
+ * Discriminated union for different relationship types
+ */
+export type Relationship = (BaseRelationship & {
+    method: 'has' | 'for';
     pivotAttributes?: never;
-};
-type ForRelationship = BaseRelationship & {
-    method: 'for';
-    pivotAttributes?: never;
-};
-type HasAttachedRelationship = BaseRelationship & {
+}) | (BaseRelationship & {
     method: 'hasAttached';
     pivotAttributes?: Record<string, unknown>;
-};
-type Relationship = HasRelationship | ForRelationship | HasAttachedRelationship;
-type CsrfTokenProps = {
-    page: Page;
-};
-type FactoryOptions = {
+});
+/**
+ * Options for factory
+ */
+export interface FactoryOptions {
     model: string;
     attributes?: Record<string, unknown>;
-    states?: Array<string>;
+    states?: string[];
     count?: number;
-    relationships?: Array<Relationship>;
-    load?: Array<string>;
-};
-type FactoryProps = {
-    page: Page;
-    options: FactoryOptions;
-};
-type LoginOptionsUsingId = {
+    relationships?: Relationship[];
+    load?: string[];
+}
+/**
+ * Types for login with discrimination
+ */
+export type LoginOptions = {
     id: number;
-    load?: Array<string>;
+    load?: string[];
     attributes?: never;
     relationships?: never;
     states?: never;
-};
-type LoginOptionsUsingFactory = {
+} | {
     id?: never;
-    load?: Array<string>;
-    attributes: Record<string, unknown>;
-    relationships?: Array<Relationship>;
-    states?: Array<string>;
+    load?: string[];
+    attributes?: Record<string, unknown>;
+    relationships?: Relationship[];
+    states?: string[];
 };
-type LoginOptions = LoginOptionsUsingId | LoginOptionsUsingFactory;
-type LoginProps = {
-    page: Page;
-    options?: LoginOptions;
-};
-type LogoutProps = {
-    page: Page;
-};
-type UserProps = {
-    page: Page;
-};
-export declare function csrfToken({ page }: CsrfTokenProps): Promise<string>;
-export declare function factory<T = unknown>({ page, options }: FactoryProps): Promise<T>;
-export declare function login<T = unknown>({ page, options }: LoginProps): Promise<T>;
-export declare function logout({ page }: LogoutProps): Promise<void>;
-export declare function user<T = unknown>({ page }: UserProps): Promise<T>;
-export {};
+/**
+ * Gets the CSRF token for subsequent requests
+ * @param page - Playwright Page instance
+ * @returns The CSRF token as a string
+ */
+export declare function csrfToken(page: Page): Promise<string>;
+/**
+ * Creates models using Laravel factories
+ * @template T - Return type (model or collection)
+ * @param page - Playwright Page instance
+ * @param options - Factory options
+ * @returns A promise resolving to the created model or collection
+ */
+export declare function factory<T = unknown>(page: Page, options: FactoryOptions): Promise<T>;
+/**
+ * Logs in with an existing user or creates a new one
+ * @template T - Return type (typically the user model)
+ * @param page - Playwright Page instance
+ * @param options - Login options (optional)
+ * @returns A promise resolving to the authenticated user
+ */
+export declare function login<T = unknown>(page: Page, options?: LoginOptions): Promise<T>;
+/**
+ * Logs out the currently authenticated user
+ * @param page - Playwright Page instance
+ * @returns A promise resolving when the logout is completed
+ */
+export declare function logout(page: Page): Promise<void>;
+/**
+ * Gets the currently authenticated user
+ * @template T - Return type (typically the user model)
+ * @param page - Playwright Page instance
+ * @returns A promise resolving to the currently authenticated user
+ */
+export declare function user<T = unknown>(page: Page): Promise<T>;
