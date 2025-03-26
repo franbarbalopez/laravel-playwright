@@ -1,8 +1,20 @@
+<div align="center">
+    <img alt="Latest Version on Packagist" src="https://img.shields.io/packagist/v/franbarbalopez/laravel-playwright.svg?style=flat-square">
+    <img alt="GitHub Tests Action Status" src="https://img.shields.io/github/actions/workflow/status/franbarbalopez/laravel-playwright/tests.yml?branch=main&amp;label=tests&amp;style=flat-square">
+    <img alt="Total Downloads" src="https://img.shields.io/packagist/dt/franbarbalopez/laravel-playwright.svg?style=flat-square">
+    <img alt="License" src="https://img.shields.io/packagist/l/franbarbalopez/laravel-playwright.svg?style=flat-square">
+</div>
+
+<br>
+
 # Laravel Playwright
 
 A Laravel package that integrates Laravel testing functionality with Playwright. Use Laravel's powerful factories, authentication and other features directly in your Playwright tests.
 
 ## Installation
+
+> [!WARNING]
+> **ALPHA RELEASE** – This package is in the **alpha phase**, meaning its structure may change significantly. It is recommended for internal testing and controlled environments only.
 
 ### Requirements
 
@@ -12,7 +24,7 @@ A Laravel package that integrates Laravel testing functionality with Playwright.
 ### Via composer
 
 ```bash
-composer require --dev franbarbalopez/laravel-playwright
+composer require franbarbalopez/laravel-playwright:0.1.1-alpha --dev
 ```
 
 ### Setup
@@ -26,6 +38,9 @@ This will:
 - Install Playwright if it's not already installed
 - Ask for your Playwright tests directory location
 - Copy the necessary JavaScript helper files
+
+> [!IMPORTANT]
+> After installation, you must uncomment and update the `baseURL` in your playwright config file.
 
 ## Usage
 
