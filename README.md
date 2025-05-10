@@ -24,7 +24,7 @@ A Laravel package that integrates Laravel testing functionality with Playwright.
 ### Via composer
 
 ```bash
-composer require franbarbalopez/laravel-playwright:0.1.1-alpha --dev
+composer require franbarbalopez/laravel-playwright:0.1.0-alpha --dev
 ```
 
 ### Setup
@@ -248,3 +248,40 @@ const currentUser = await user(page)
 // Logout
 await logout(page)
 ```
+
+## Artisan Commands
+
+You can execute any Laravel Artisan command from your Playwright tests using the `artisan` endpoint. This is useful for resetting the database, clearing caches, or running any custom Artisan command during your end-to-end tests.
+
+### Usage Example (JavaScript)
+
+```js
+await page.request.post('/__playwright__/artisan', {
+    data: {
+        command: 'migrate:fresh',
+        parameters: {
+            '--seed': true,
+        }
+    }
+})
+```
+
+- `command`: The Artisan command you want to run (e.g., `migrate:fresh`, `cache:clear`, `route:list`).
+- `parameters`: (Optional) An object with any parameters or options you want to pass to the command.
+
+#### Example: List all routes in JSON format
+
+```js
+await page.request.post('/__playwright__/artisan', {
+    data: {
+        command: 'route:list',
+        parameters: {
+            '--format': 'json'
+        }
+    }
+})
+```
+
+#### Error Handling
+
+If you try to run a non-existent command, the endpoint will return a 500 error.

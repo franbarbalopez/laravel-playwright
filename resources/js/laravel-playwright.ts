@@ -40,7 +40,7 @@ export interface FactoryOptions {
  * Types for login with discrimination
  */
 export type LoginOptions = 
-  | { id: number; load?: string[]; attributes?: never; relationships?: never; states?: never }
+  | { id: number | string; load?: string[]; attributes?: never; relationships?: never; states?: never }
   | { id?: never; load?: string[]; attributes?: Record<string, unknown>; relationships?: Relationship[]; states?: string[] };
 
 /**
@@ -131,3 +131,43 @@ export async function user<T = unknown>(page: Page): Promise<T> {
 
   return response.json() as T;
 }
+
+/**
+ * Runs an Artisan command
+ * @param page - Playwright Page instance
+ * @param command - The Artisan command to run
+ * @param parameters - Additional parameters for the command
+ */
+export async function artisan(page: Page, command: string, parameters: Record<string, unknown> = {}): Promise<void> {
+  const token = await csrfToken(page);
+
+  await page.request.post('/__playwright__/artisan', {
+    headers: { ...commonHeaders, 'X-CSRF-TOKEN': token },
+    data: { command, parameters },
+  });
+}
+
+/**
+ * Refreshes the database
+ * @param page - Playwright Page instance
+ * @param parameters - Additional parameters for the command
+ */
+export async function refreshDatabase(page: Page, parameters: Record<string, unknown> = {}): Promise<void> {
+  return await artisan(page, 'migrate:fresh', parameters);
+}
+
+/**
+ * Seeds the database
+ * @param page - Playwright Page instance
+ * @param seederClass - The seeder class to use
+ */
+export async function seedDatabase(page: Page, seederClass: string = ''): Promise<void> {
+  const parameters: Record<string, string> = {};
+
+  if (seederClass) {
+    parameters['--class'] = seederClass;
+  }
+
+  return await artisan(page, 'db:seed', parameters);
+}
+

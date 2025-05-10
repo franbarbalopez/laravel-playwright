@@ -8,3 +8,4 @@ Route::post('__playwright__/factory', [PlaywrightController::class, 'factory'])-
 Route::post('__playwright__/login', [PlaywrightController::class, 'login'])->name('playwright.login');
 Route::post('__playwright__/logout', [PlaywrightController::class, 'logout'])->name('playwright.logout');
 Route::get('__playwright__/user', [PlaywrightController::class, 'user'])->name('playwright.user');
+Route::post('__playwright__/artisan', [PlaywrightController::class, 'artisan'])->name('playwright.artisan');

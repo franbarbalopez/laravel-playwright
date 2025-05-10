@@ -39,7 +39,7 @@ export interface FactoryOptions {
  * Types for login with discrimination
  */
 export type LoginOptions = {
-    id: number;
+    id: number | string;
     load?: string[];
     attributes?: never;
     relationships?: never;
@@ -86,3 +86,22 @@ export declare function logout(page: Page): Promise<void>;
  * @returns A promise resolving to the currently authenticated user
  */
 export declare function user<T = unknown>(page: Page): Promise<T>;
+/**
+ * Runs an Artisan command
+ * @param page - Playwright Page instance
+ * @param command - The Artisan command to run
+ * @param parameters - Additional parameters for the command
+ */
+export declare function artisan(page: Page, command: string, parameters?: Record<string, unknown>): Promise<void>;
+/**
+ * Refreshes the database
+ * @param page - Playwright Page instance
+ * @param parameters - Additional parameters for the command
+ */
+export declare function refreshDatabase(page: Page, parameters?: Record<string, unknown>): Promise<void>;
+/**
+ * Seeds the database
+ * @param page - Playwright Page instance
+ * @param seederClass - The seeder class to use
+ */
+export declare function seedDatabase(page: Page, seederClass?: string): Promise<void>;

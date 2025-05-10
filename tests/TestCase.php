@@ -48,6 +48,7 @@ abstract class TestCase extends BaseTestCase
             $router->post('__playwright__/login', [PlaywrightController::class, 'login'])->name('playwright.login');
             $router->post('__playwright__/logout', [PlaywrightController::class, 'logout'])->name('playwright.logout');
             $router->get('__playwright__/user', [PlaywrightController::class, 'user'])->name('playwright.user');
+            $router->post('__playwright__/artisan', [PlaywrightController::class, 'artisan'])->name('playwright.artisan');
         });
     }
 }

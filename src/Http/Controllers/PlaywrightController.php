@@ -5,6 +5,8 @@ namespace FranBarbaLopez\LaravelPlaywright\Http\Controllers;
 use FranBarbaLopez\LaravelPlaywright\Services\FactoryService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Auth;
 
 class PlaywrightController
 {
@@ -79,18 +81,26 @@ class PlaywrightController
             $user->load($load);
         }
 
-        auth()->login($user);
+        Auth::login($user);
 
         return response()->json($user);
     }
 
     public function logout(): void
     {
-        auth()->logout();
+        Auth::logout();
     }
 
     public function user()
     {
-        return response()->json(auth()->user());
+        return response()->json(Auth::user());
+    }
+
+    public function artisan(Request $request): void
+    {
+        $command = $request->input('command');
+        $parameters = $request->input('parameters', []);
+
+        Artisan::call($command, $parameters);
     }
 }

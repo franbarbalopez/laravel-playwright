@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Workbench\App\Models\Post;
 use Workbench\App\Models\Role;
@@ -324,8 +325,8 @@ test('can login using existing user id', function () {
             ->etc()
         );
 
-    expect(auth()->check())->toBeTrue();
-    expect(auth()->id())->toBe($user->id);
+    expect(Auth::check())->toBeTrue();
+    expect(Auth::id())->toBe($user->id);
 });
 
 test('can login using existing user id with relations loaded', function () {
@@ -341,7 +342,7 @@ test('can login using existing user id with relations loaded', function () {
             ->etc()
         );
 
-    expect(auth()->id())->toBe($user->id);
+    expect(Auth::id())->toBe($user->id);
 });
 
 test('can create and login new user', function () {
@@ -357,7 +358,7 @@ test('can create and login new user', function () {
             ->etc()
         );
 
-    expect(auth()->check())->toBeTrue();
+    expect(Auth::check())->toBeTrue();
 });
 
 test('can create and login new user with states', function () {
@@ -380,25 +381,25 @@ test('can create and login new user with states', function () {
             ->etc()
         );
 
-    expect(auth()->check())->toBeTrue();
+    expect(Auth::check())->toBeTrue();
 });
 
 test('can logout user', function () {
     $user = User::factory()->create();
 
-    auth()->login($user);
+    Auth::login($user);
 
-    expect(auth()->check())->toBeTrue();
+    expect(Auth::check())->toBeTrue();
 
     $this->postJson(route('playwright.logout'));
 
-    expect(auth()->check())->toBeFalse();
+    expect(Auth::check())->toBeFalse();
 });
 
 test('returns authenticated user', function () {
     $user = User::factory()->create();
 
-    auth()->login($user);
+    Auth::login($user);
 
     $this->getJson(route('playwright.user'))
         ->assertOk()
@@ -424,9 +425,30 @@ test('creates a new model using for method with states applied to related model'
         ->assertOk()
         ->assertJson(fn (AssertableJson $json) => $json->has('user', fn (AssertableJson $json) => $json
             ->where('name', 'John Doe with State')
-            ->where('email_verified_at', null) // Verificamos que el estado 'unverified' se aplicó correctamente
+            ->where('email_verified_at', null)
             ->etc()
         )
             ->etc()
         );
+});
+
+test('can execute artisan command', function () {
+    $this->postJson(route('playwright.artisan'), [
+        'command' => 'list',
+    ])->assertOk();
+});
+
+test('can execute artisan command with parameters', function () {
+    $this->postJson(route('playwright.artisan'), [
+        'command' => 'list',
+        'parameters' => [
+            '--format' => 'json',
+        ],
+    ])->assertOk();
+});
+
+test('handles invalid artisan command', function () {
+    $this->postJson(route('playwright.artisan'), [
+        'command' => 'non-existent-command',
+    ])->assertInternalServerError();
 });
