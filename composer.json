@@ -2,7 +2,7 @@
     "name": "franbarbalopez/laravel-playwright",
     "description": "A Laravel Package to use Laravel testing functionality into Playwright",
     "type": "library",
-    "version": "0.1.0-alpha",
+    "version": "0.2.0-alpha",
     "require": {
         "php": "^8.2",
         "illuminate/support": "^11.0|^12.0"

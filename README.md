@@ -24,7 +24,7 @@ A Laravel package that integrates Laravel testing functionality with Playwright.
 ### Via composer
 
 ```bash
-composer require franbarbalopez/laravel-playwright:0.1.0-alpha --dev
+composer require franbarbalopez/laravel-playwright:0.2.0-alpha --dev
 ```
 
 ### Setup
